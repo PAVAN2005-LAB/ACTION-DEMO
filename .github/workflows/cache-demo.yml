@@ -1,0 +1,41 @@
+name: Cache Demo Workflow
+
+on:
+  workflow_dispatch: # lets you run it manually from Actions tab
+
+jobs:
+  cache-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: prime-cache-1321178
+        id: cache-deps
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: cache-1321178
+
+      - name: Echo cache status
+        run: echo "Cache hit? ${{ steps.cache-deps.outputs.cache-hit }}"
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+          pip freeze > requirements.txt
+
+      - name: Run sample script
+        run: |
+          python - <<'EOF'
+          import requests
+          url = "http://api.open-notify.org/iss-now.json"
+          data = requests.get(url).json()
+          print("ISS location:", data)
+          EOF
