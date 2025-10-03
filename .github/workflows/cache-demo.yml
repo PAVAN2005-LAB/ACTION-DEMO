@@ -1,0 +1,56 @@
+name: Cache Demo
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-with-cache:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Cache node modules
+      id: cache-npm
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+          
+    - name: Install dependencies
+      if: steps.cache-npm.outputs.cache-hit != 'true'
+      run: |
+        if [ -f package.json ]; then
+          npm ci
+        else
+          echo "No package.json found, creating a simple demo"
+          npm init -y
+          npm install express
+        fi
+        
+    - name: Show cache status
+      run: |
+        if [ "${{ steps.cache-npm.outputs.cache-hit }}" == "true" ]; then
+          echo "✅ Cache hit! Dependencies were restored from cache."
+        else
+          echo "❌ Cache miss! Dependencies were installed fresh."
+        fi
+        
+    - name: List dependencies
+      run: |
+        if [ -d node_modules ]; then
+          echo "Installed node modules:"
+          ls -la node_modules | head -20
+        fi

@@ -1,0 +1,20 @@
+{
+  "name": "action-demo-cache",
+  "version": "1.0.0",
+  "description": "GitHub Actions Cache Demo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Test passed!\""
+  },
+  "keywords": [
+    "github-actions",
+    "cache",
+    "demo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
